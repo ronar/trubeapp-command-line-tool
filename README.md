@@ -30,24 +30,18 @@ None
 
 ## Commands
 
--h, --help            show this help message and exit
--w, --wipe            wipe all partner auth info
--v, --verbose         increase output verbosity
--u USER, --user USER
---password PASSWORD
--l, --list-bookings   prints list of bookings
--p PROPOSE, --propose PROPOSE
-                      partner proposes for booking
--s START_SESSION, --start-session START_SESSION
-                      partner starts a session
--c CONCLUDE_SESSION, --conclude-session CONCLUDE_SESSION
-                      partner concludes a session
--d DECLINE_SESSION, --decline-session DECLINE_SESSION
-                      partner declines a booking
--t TRAINER_DECLINING, --trainer-declining TRAINER_DECLINING
-                      partner declines a direct booking
--r REJECT, --reject REJECT
-                      partner rejects an assigned session
+`-h, --help`            show this help message and exit  
+`-w, --wipe`            wipe all partner auth info  
+`-v, --verbose`         increase output verbosity  
+`-u USER, --user USER`  
+`--password PASSWORD`  
+`-l, --list-bookings`   prints list of bookings  
+`-p PROPOSE, --propose PROPOSE`  partner proposes for booking  
+`-s START_SESSION, --start-session START_SESSION`  partner starts a session  
+`-c CONCLUDE_SESSION, --conclude-session CONCLUDE_SESSION`  partner concludes a session  
+`-d DECLINE_SESSION, --decline-session DECLINE_SESSION`  partner declines a booking  
+`-t TRAINER_DECLINING, --trainer-declining TRAINER_DECLINING`  partner declines a direct booking  
+`-r REJECT, --reject REJECT`  partner rejects an assigned session  
 
 
 ## License
