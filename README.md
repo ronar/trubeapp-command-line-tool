@@ -9,7 +9,7 @@ of Partner APP without installing it. 😁
 Clone the repository and run the `python propose.py` command:
 
 ```bash
-$ git clone https://github.com/ronar/trubeapp-command-line-tool.git
+$ git clone git@github.com:ronar/trubeapp-command-line-tool.git
 $ cd trubeapp-command-line-tool
 $ python propose.py
 ```
@@ -20,7 +20,7 @@ For help provide the `-h` or `--help` flag:
 $ python propose.py -h
 ```
 
-And that's it!
+And that's it! Default user and password could be added for more convinient way working with the program.
 
 
 ## Requirements
@@ -35,19 +35,19 @@ None
 `-v, --verbose`         increase output verbosity  
 `-u USER, --user USER`  
 `--password PASSWORD`  
-`-l, --list-bookings`   prints list of bookings  
-`-p PROPOSE, --propose PROPOSE`  partner proposes for booking  
-`-s START_SESSION, --start-session START_SESSION`  partner starts a session  
-`-c CONCLUDE_SESSION, --conclude-session CONCLUDE_SESSION`  partner concludes a session  
-`-d DECLINE_SESSION, --decline-session DECLINE_SESSION`  partner declines a booking  
-`-t TRAINER_DECLINING, --trainer-declining TRAINER_DECLINING`  partner declines a direct booking  
-`-r REJECT, --reject REJECT`  partner rejects an assigned session  
+`-l, --list-bookings` | prints list of bookings  
+`-p PROPOSE, --propose PROPOSE` | partner proposes for booking  
+`-s START_SESSION, --start-session START_SESSION` | partner starts a session  
+`-c CONCLUDE_SESSION, --conclude-session CONCLUDE_SESSION` | partner concludes a session  
+`-d DECLINE_SESSION, --decline-session DECLINE_SESSION` | partner declines a booking  
+`-t TRAINER_DECLINING, --trainer-declining TRAINER_DECLINING` | partner declines a direct booking  
+`-r REJECT, --reject REJECT` | partner rejects an assigned session  
 
 
 ## License
 
 ```
-    TruBe Command Line Tools
+    TruBe Command Line Tool
     Copyright (C) 2017  Vladimir Shishlyannikov
 
                     GNU GENERAL PUBLIC LICENSE

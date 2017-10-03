@@ -8,23 +8,58 @@ import argparse
 import pickle
 
 apiURL = 'http://api.dev.trubeapp.com/v3'
-user = 'default@mail.ru'
-password = 'default'
+user = ''
+password = ''
 partner = {'id': '', 'token': '', 'email': ''}
 
+messages = {
+    'wipe': 'wipe all partner auth info',
+    'verbosity': 'increase output verbosity',
+    'list_bookings': 'prints list of bookings',
+    'proposal': {
+        'help'   : 'partner proposes for booking',
+        'request': 'trying to propose for the booking..',
+        'success': 'booking ({}) was successfull',
+        'failure': 'there was error while proposing booking: '
+    },
+    'start_session': {
+        'help'   : 'partner starts a session',
+        'request': 'trying to start the session..',
+        'success': 'booking ({}) was started successfully',
+        'failure': 'there was error while starting the session: '
+    },
+    'conclude_session': {
+        'help'   : 'partner concludes a session',
+        'request': 'trying to conclude a session..',
+        'success': 'booking ({}) was stopped successfully',
+        'failure': 'there was error while stopping the session: '
+    },
+    'decline_session': {
+        'help'   : 'partner declines a booking',
+        'request': 'trying to decline the booking..',
+        'success': 'booking ({}) was declined successfully',
+        'failure': 'there was error while declining the session: '
+    },
+    'reject': {
+        'help'   : 'partner rejects an assigned session',
+        'request': 'trying to reject the session..',
+        'success': 'booking ({}) was rejected successfully',
+        'failure': 'there was error while rejecting the session: '
+    }
+}
+
 parser = argparse.ArgumentParser('TruBe API command line tool')
-parser.add_argument('-w', '--wipe', action='store_true', help='wipe all partner auth info')
-parser.add_argument('-v', '--verbose', action='store_true', help='increase output verbosity')
+parser.add_argument('-w', '--wipe', action='store_true', help=messages['wipe'])
+parser.add_argument('-v', '--verbose', action='store_true', help=messages['verbosity'])
 parser.add_argument('-u', '--user', type=str, action='store', default=user)
 parser.add_argument('--password', type=str, action='store', default=password)
-parser.add_argument('-l', '--list-bookings', action='store_true', help='prints list of bookings')
+parser.add_argument('-l', '--list-bookings', action='store_true', help=messages['list_bookings'])
 group = parser.add_mutually_exclusive_group()
-group.add_argument('-p', '--propose', type=int, action='store', help='partner proposes for booking')
-group.add_argument('-s', '--start-session', type=int, action='store', help='partner starts a session')
-group.add_argument('-c', '--conclude-session', type=int, action='store', help='partner concludes a session')
-group.add_argument('-d', '--decline-session', type=int, action='store', help='partner declines a booking')
-group.add_argument('-t', '--trainer-declining', type=int, action='store', help='partner declines a direct booking')
-group.add_argument('-r', '--reject', type=int, action='store', help='partner rejects an assigned session')
+group.add_argument('-p', '--propose', type=int, action='store', help=messages['proposal']['help'])
+group.add_argument('-s', '--start-session', type=int, action='store', help=messages['start_session']['help'])
+group.add_argument('-c', '--conclude-session', type=int, action='store', help=messages['conclude_session']['help'])
+group.add_argument('-d', '--decline-session', type=int, action='store', help=messages['decline_session']['help'])
+group.add_argument('-r', '--reject', type=int, action='store', help=messages['reject']['help'])
 args = parser.parse_args()
 
 # wipe the token
@@ -180,77 +215,33 @@ def dumpResponse(response):
 # Make kwargs
 @withAuthInfo
 def makeRequest(url, headers = {}, payload = {}):
+    print json.dumps(payload, indent=4, sort_keys=True)
     response = requests.post(url, headers=headers, data=json.dumps(payload))
     dumpResponse(response)
 
 
-def partnerProposal(bookingId):
-    payload = {'expiration': 10, 'offsets': [{'time': 10, 'surcharge': 10.05, 'venueFee': 10.05}, {'time': 20, 'surcharge': 10.05, 'venueFee': 10.05}, {'time': 30, 'surcharge': 10.05, 'venueFee': 10.05}, {'time': 40, 'surcharge': 10.05, 'venueFee': 10.05}, {'time': 50, 'surcharge': 10.05, 'venueFee': 10.05}, {'time': 60, 'surcharge': 10.05, 'venueFee': 10.05}]}
+def requestFnFactory(path, messages):
+    def func(bookingId, payload = {}):
+        try:
+            if args.verbose:
+                print messages['request']
 
-    try:
-        if args.verbose:
-            print 'trying to propose for the booking..'
-
-        makeRequest(bookingsPath(bookingId, 'acceptance'), getHeaders(), payload)
-    except Exception as e:
-        print 'there was error while proposing booking: ', e
-    else:
-        # if args.verbose:
-        print 'booking ({}) was successfull'.format(bookingId)
-
-
-def partnerStartsSession(bookingId):
-    try:
-        if args.verbose:
-            print 'trying to start a session..'
-
-        makeRequest(bookingsPath(bookingId, 'session-start'), getHeaders())
-    except Exception as e:
-        print 'there was error while proposing booking: ', e
-    else:
-        # if args.verbose:
-        print 'booking ({}) was started successfully'.format(bookingId)
+            makeRequest(bookingsPath(bookingId, path), getHeaders(), payload)
+        except Exception as e:
+            print messages['failure'], e
+        else:
+            # if args.verbose:
+            print messages['success'].format(bookingId)
 
 
-def partnerStopsSession(bookingId):
-    try:
-        if args.verbose:
-            print 'trying to conclude a session..'
-
-        makeRequest(bookingsPath(bookingId, 'session-stop'), getHeaders())
-    except Exception as e:
-        print 'there was error while starting a session: ', e
-    else:
-        # if args.verbose:
-        print 'booking ({}) was stopped successfully'.format(bookingId)
+    return func
 
 
-def partnerDeclinesSession(bookingId, reason):
-    try:
-        if args.verbose:
-            print 'trying to propose for the booking..'
-
-        payload = {'reason': reason}
-
-        makeRequest(bookingsPath(bookingId, 'session-declined'), getHeaders(), payload)
-    except Exception as e:
-        print 'there was error while declining a session: ', e
-    else:
-        # if args.verbose:
-        print 'booking ({}) was declined successfully'.format(bookingId)
-
-
-def partnerRejectsSession(bookingId):
-    try:
-        if args.verbose:
-            print 'trying to reject the session..'
-
-        makeRequest(bookingsPath(bookingId, 'cancellation'), getHeaders(), payload)
-    except Exception as e:
-        print 'there was error while rejecting a session: ', e
-    else:
-        # if args.verbose:
-        print 'booking ({}) was rejected successfully'.format(bookingId)
+partnerProposals = requestFnFactory('acceptance', messages['proposal'])
+partnerStartsSession = requestFnFactory('session-start', messages['start_session'])
+partnerStopsSession = requestFnFactory('session-stop', messages['conclude_session'])
+partnerDeclinesSession = requestFnFactory('session-declined', messages['decline_session'])
+partnerRejectsSession = requestFnFactory('cancellation', messages['reject'])
 
 
 @withAuthInfo
@@ -288,7 +279,9 @@ if args.list_bookings:
 
 
 if args.propose:
-    partnerProposal(args.propose)
+    #payload = {'expiration': 10, 'offsets': [{'time': 10, 'surcharge': 10.05, 'venueFee': 10.05}, {'time': 20, 'surcharge': 10.05, 'venueFee': 10.05}, {'time': 30, 'surcharge': 10.05, 'venueFee': 10.05}, {'time': 40, 'surcharge': 10.05, 'venueFee': 10.05}, {'time': 50, 'surcharge': 10.05, 'venueFee': 10.05}, {'time': 60, 'surcharge': 10.05, 'venueFee': 10.05}]}
+    payload = {'offsets': [10, 20, 30, 40, 50, 60]}
+    partnerProposals(args.propose, payload)
 
 
 if args.start_session:
@@ -300,12 +293,9 @@ if args.conclude_session:
 
 
 if args.decline_session:
-    partnerDeclinesSession(args.decline_session, 'Restricted by travel or distance')
-
-
-if args.trainer_declining:
-    partnerDeclinesDirectBooking(args.trainer_declining)
+    payload = {'reason': 'Restricted by travel or distance'}
+    partnerDeclinesSession(args.decline_session, payload)
 
 
 if args.reject:
-    partnerDeclinesDirectBooking(args.reject)
+    partnerRejectsSession(args.reject)
