@@ -155,8 +155,8 @@ def withAuthInfo(func):
             return func(url, headers, payload)
 
         try:
-            payload = {'email': args.user, 'password': args.password}
-            response = requests.post(apiURL + '/partners/auth', headers=getHeaders(), data=json.dumps(payload))
+            authPayload = {'email': args.user, 'password': args.password}
+            response = requests.post(apiURL + '/partners/auth', headers=getHeaders(), data=json.dumps(authPayload))
         except Exception as e:
             print 'there was error while authenticating: ', e
         else:
@@ -183,9 +183,6 @@ def withAuthInfo(func):
 
                 headers.update({'AUTH_TOKEN': tokenId})
                 url = apiURL + '/partners/{}/{}'.format(partnerId, url)
-
-                print 'headers ', headers
-                print 'url ', url
 
                 return func(url, headers, payload)
 
